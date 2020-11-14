@@ -93,8 +93,6 @@ const Map: React.FC<Props> = ({ currentRegion, destination, changeDestination })
       )}
       
       <Marker
-        flat
-        tracksViewChanges={false}
         icon={MapMarker}
         anchor={{ x: 0.5, y: 0.5 }}
         coordinate={{

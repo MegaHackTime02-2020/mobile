@@ -45,7 +45,7 @@ const Home: React.FC = () => {
       })
 
       const title = titleArray[0].name || titleArray[0].street || 'Origem';
-      console.log('a')
+
       setCurrentRegion({
         latitude,
         longitude,

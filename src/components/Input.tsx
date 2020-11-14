@@ -24,7 +24,7 @@ const Input: React.FC<Props> = ({ onLocationSelected }) => {
         language: 'pt',
         components: 'country:br',
       }}
-      listViewDisplayed={inputFocused}
+      listViewDisplayed='auto'
       fetchDetails
       textInputProps={{
         autoCapitalize: 'words',
