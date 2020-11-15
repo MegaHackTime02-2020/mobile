@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Dimensions, View, Text, Platform } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { Feather } from '@expo/vector-icons';
@@ -6,7 +6,6 @@ import { Feather } from '@expo/vector-icons';
 import Direction from './Direction';
 
 import { getPixelSize } from '../utils';
-import MapMarker from '../images/MapMarker.png';
 import marker from '../images/marker.png';
 
 interface Props {
@@ -20,14 +19,31 @@ interface Props {
     longitude: number;
     title: string;
   },
-  changeDestination: () => void,
+  changeDestination?: () => void,
+  goToDestination?: {
+      latitude: number;
+      longitude: number;
+  };
 }
 
-const Map: React.FC<Props> = ({ currentRegion, destination, changeDestination }) => {
+const Map: React.FC<Props> = ({ currentRegion, destination, changeDestination, children, goToDestination }) => {
   const mapRef = useRef<MapView>(null);
 
   const [duration, setDuration] = useState<Number>()
+  
+  useEffect(() => {
+    if (!goToDestination) return;
 
+    mapRef.current?.animateCamera({
+      center: {
+        latitude: goToDestination.latitude,
+        longitude: goToDestination.longitude,
+      }
+    }, {
+      duration: 1000,
+    })
+  }, [goToDestination, destination]);
+  
   return (
     <MapView
       provider={PROVIDER_GOOGLE}
@@ -63,8 +79,8 @@ const Map: React.FC<Props> = ({ currentRegion, destination, changeDestination })
 
           <Marker
             coordinate={destination}
-            anchor={{ x: 0, y: 0 }}
-            icon={marker}
+            anchor={{ x: 0, y: 0.2 }}
+            image={marker}
             onPress={changeDestination}
           >
             <View
@@ -92,46 +108,7 @@ const Map: React.FC<Props> = ({ currentRegion, destination, changeDestination })
         </>
       )}
       
-      <Marker
-        icon={MapMarker}
-        anchor={{ x: 0.5, y: 0.5 }}
-        coordinate={{
-          latitude: currentRegion.latitude + 0.005,
-          longitude: currentRegion.longitude + 0.005,
-        }}
-      />
-      <Marker
-        icon={MapMarker}
-        anchor={{ x: 0.5, y: 0.5 }}
-        coordinate={{
-          latitude: currentRegion.latitude - 0.005,
-          longitude: currentRegion.longitude - 0.005,
-        }}
-      />      
-      <Marker
-        icon={MapMarker}
-        anchor={{ x: 0.5, y: 0.5 }}
-        coordinate={{
-          latitude: currentRegion.latitude + 0.005,
-          longitude: currentRegion.longitude - 0.005,
-        }}
-      />      
-      <Marker
-        icon={MapMarker}
-        anchor={{ x: 0.5, y: 0.5 }}
-        coordinate={{
-          latitude: currentRegion.latitude - 0.005,
-          longitude: currentRegion.longitude + 0.005,
-        }}
-      />      
-      <Marker
-        icon={MapMarker}
-        anchor={{ x: 0.5, y: 0.5 }}
-        coordinate={{
-          latitude: currentRegion.latitude + 0.002,
-          longitude: currentRegion.longitude + 0.002,
-        }}
-      />      
+      {children}      
     </MapView>
   );
 }

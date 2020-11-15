@@ -31,7 +31,7 @@ const Modal: React.FC<Props> = ({ changeDestination }) => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#FFF',
-    height: 300,
+    height: 280,
     width: '100%',
     position: 'absolute',
     bottom: 0,
@@ -43,7 +43,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#DDD',
     alignItems: 'center',
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
   },
 
   backButton: {

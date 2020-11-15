@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
+import { View, StyleSheet, Alert, Text, TouchableOpacity } from 'react-native';
 import * as Location from 'expo-location';
 import {
   GooglePlaceData,
   GooglePlaceDetail,
 } from 'react-native-google-places-autocomplete';
+import { FontAwesome5 } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { Marker } from 'react-native-maps';
 
 import Map from '../components/Map';
 import Input from '../components/Input';
 import Modal from '../components/Modal';
+
 import googleApiKey from '../config/googleApiKey';
+import MapMarker from '../images/MapMarker.png';
 
 interface Region {
   latitude: number;
@@ -20,6 +25,9 @@ interface Region {
 const Home: React.FC = () => {
   const [currentRegion, setCurrentRegion] = useState<Region>();
   const [destination, setDestination] = useState<Region>();
+  const [inputFocused, setInputFocused] = useState(false);
+
+  const navigation = useNavigation();
 
   useEffect(() => {
     async function loadPosition() {
@@ -68,6 +76,12 @@ const Home: React.FC = () => {
     }
   }
 
+  function handleNavigationToParks() {
+    navigation.navigate('Parks', {
+      currentRegion,
+    })
+  }
+
   return (
     <View style={styles.container}>
       {currentRegion &&
@@ -75,12 +89,80 @@ const Home: React.FC = () => {
           currentRegion={currentRegion}
           destination={destination}
           changeDestination={() => setDestination(undefined)}
-        />
+        >
+          <Marker
+            icon={MapMarker}
+            anchor={{ x: 0.5, y: 0.5 }}
+            coordinate={{
+              latitude: currentRegion.latitude + 0.005,
+              longitude: currentRegion.longitude + 0.005,
+            }}
+          />
+          <Marker
+            icon={MapMarker}
+            anchor={{ x: 0.5, y: 0.5 }}
+            coordinate={{
+              latitude: currentRegion.latitude - 0.005,
+              longitude: currentRegion.longitude - 0.005,
+            }}
+          />      
+          <Marker
+            icon={MapMarker}
+            anchor={{ x: 0.5, y: 0.5 }}
+            coordinate={{
+              latitude: currentRegion.latitude + 0.005,
+              longitude: currentRegion.longitude - 0.005,
+            }}
+          />      
+          <Marker
+            icon={MapMarker}
+            anchor={{ x: 0.5, y: 0.5 }}
+            coordinate={{
+              latitude: currentRegion.latitude - 0.005,
+              longitude: currentRegion.longitude + 0.005,
+            }}
+          />      
+          <Marker
+            icon={MapMarker}
+            anchor={{ x: 0.5, y: 0.5 }}
+            coordinate={{
+              latitude: currentRegion.latitude + 0.002,
+              longitude: currentRegion.longitude + 0.002,
+            }}
+          />
+        </Map>
       }
       {destination ? (
+        <>
+        <View style={styles.blueBarModal}>
+          <Text style={styles.blueBarModalText}>
+            Você economizará 15 minutos por não precisar procurar por vagas.
+          </Text>
+        </View>
+
         <Modal changeDestination={() => setDestination(undefined)}/> 
+      </>
       ) : (
-        <Input onLocationSelected={handleLocationSelected} />
+        <>
+          {!inputFocused && (
+            <>
+              <TouchableOpacity onPress={handleNavigationToParks} style={styles.blueBar}>
+                <FontAwesome5 name="car-alt" size={38} color="#F8F5F5" />
+                <Text style={styles.blueBarText}>
+                  Verifique aqui vagas de Estacionamento mais próximo de seu destino.
+                </Text>
+              </TouchableOpacity>
+
+              <View style={styles.inputWrapper} />
+            </>
+          )}
+
+          <Input
+            onLocationSelected={handleLocationSelected}
+            inputFocused={inputFocused}
+            setInputFocused={(focused) => setInputFocused(focused)}
+          />
+        </>
       )}
     </View>
   );
@@ -91,32 +173,49 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  input: {
+  blueBar: {
     position: 'absolute',
-    left: 24,
-    right: 24,
-    bottom: 32,
+    bottom: 109,
+    width: '100%',
 
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    height: 48,
-    paddingLeft: 24,
+    flexDirection: 'row',
+    alignItems: 'center',
 
-    elevation: 5,
+    backgroundColor: '#0119F1',
+    padding: 10,
   },
 
-  inputFocused: {
+  blueBarModal: {
     position: 'absolute',
-    left: 24,
-    right: 24,
-    top: 32,
+    bottom: 280,
+    width: '100%',
 
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    height: 48,
-    paddingLeft: 24,
+    backgroundColor: '#0119F1',
+  },
 
-    elevation: 5,
+  blueBarModalText: {
+    color: '#FBFBFB',
+    fontSize: 16,
+    textAlign: 'center',
+    marginLeft: 8,
+  },
+
+  blueBarText: {
+    color: '#FBFBFB',
+    fontSize: 16,
+    textAlign: 'center',
+    marginLeft: 8,
+    maxWidth: 300,
+  },
+
+  inputWrapper: {
+    position: 'absolute',
+    bottom: 25,
+    width: '100%',
+    height: 84,
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
   },
 })
 
